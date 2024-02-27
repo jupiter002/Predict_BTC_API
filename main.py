@@ -49,6 +49,17 @@ async def read_root(ticker1: str, ticker2:str):
 #     pred_price, real_price, date = real_time_chart(ticker)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
         
 #     return {"days":date, "pred_price":pred_price, "real_price":real_price}   
+    pred_price, real_price, date = get_crypto_price(ticker)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
+
+    return {"days":date, "pred_price":pred_price, "real_price":real_price}           # 일시와 예측 가격데이터를 spring서버로 전달
+
+
+# @app.get("/items/{item_id}")
+# def read_item(item_id: int, q: Union[str, None] = None):
+#     return {"item_id": item_id, "q": q}
+    pred_price, real_price, date = real_time_chart(ticker)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
+        
+    return {"days":date, "pred_price":pred_price, "real_price":real_price}   
 
 
 # AI API
@@ -56,7 +67,6 @@ async def read_root(ticker1: str, ticker2:str):
 
 
 def fitting_to_real_price(df):                          # 학습 데이터를 Fitting 시키는 사용자 함수
-        
     m = prh(                                            
     growth="linear",
     interval_width=0.95
