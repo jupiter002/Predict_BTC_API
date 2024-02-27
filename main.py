@@ -37,18 +37,18 @@ app.add_middleware(             # cors보안 규칙 인가
 @app.get("/responsePrice/{ticker1}/{ticker2}")
 async def read_root(ticker1: str, ticker2:str):
 
-    pred_price1, real_price1, date1 = get_crypto_price(ticker1)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
-    pred_price2, real_price2, date2 = get_crypto_price(ticker2)
+    pred_price1, real_price1 = get_crypto_price(ticker1)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
+    pred_price2, real_price2 = get_crypto_price(ticker2)
 
-    return {"days":date1, "pred_price1":pred_price1, "real_price1":real_price1,                        
-            "pred_price2":pred_price2, "real_price2":real_price2}           # 일시와 예측 가격데이터를 spring서버로 전달
+    # return [{"days":date1, "value":pred_price1}, {"days":date1,"value":real_price1}, {"days":date2,"value":pred_price2}, {"days":date2,"value":real_price2}]           # 일시와 예측 가격데이터를 spring서버로 전달
+    return [[pred_price1], [real_price1], [pred_price2], [real_price2]]
 
-@app.get("/realtimeChart/{ticker}")
-async def read_root(ticker: str):
+# @app.get("/realtimeChart/{ticker}")
+# async def read_root(ticker: str):
 
-    pred_price, real_price, date = real_time_chart(ticker)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
+#     pred_price, real_price, date = real_time_chart(ticker)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
         
-    return {"days":date, "pred_price":pred_price, "real_price":real_price}   
+#     return {"days":date, "pred_price":pred_price, "real_price":real_price}   
 
 
 # AI API
@@ -58,9 +58,8 @@ async def read_root(ticker: str):
 def fitting_to_real_price(df):                          # 학습 데이터를 Fitting 시키는 사용자 함수
         
     m = prh(                                            
-    changepoint_prior_scale = 0.3,
     growth="linear",
-    interval_width=0.6
+    interval_width=0.95
     )
 
     m.fit(df)                                           # 학습데이터 Fitting
@@ -69,7 +68,7 @@ def fitting_to_real_price(df):                          # 학습 데이터를 Fi
 
     forecast = m.predict(future)                        # 예측한 값을 forecast변수에 저장
 
-    forecast['yhat'] = forecast['yhat'].astype('float') # 숫자형식을 float로 변환
+    # forecast['yhat'] = forecast['yhat'].astype('float') # 숫자형식을 float로 변환
 
     # forecast['ds'] = forecast['ds'].astype('str')     # 예측과 실제 가격 추세 그래프를 양쪽으로 나눠서 그릴 수 있음
     
@@ -78,37 +77,54 @@ def fitting_to_real_price(df):                          # 학습 데이터를 Fi
 def get_crypto_price(ticker="BTC"):                   # 가상화폐의 가격을 가져오는 사용자 함수
 
     df = pyupbit.get_ohlcv(f"KRW-{ticker}", count=4320, interval="minute60")     # 원화 단위의 가상화폐, 시간 단위는 분 단위, 현재 시점부터 2000분 전의 데이터를 요청
+    df.reset_index(inplace=True)
     df['y'] = df['close']
-    df['ds'] = df.index
+    df['ds'] = df['index']
 
     forecast = fitting_to_real_price(df)
     
-    pred_price = forecast['yhat']                             # 데이터 프레임에 담겨있는 예측한 가격 데이터
+    #pred_price = forecast['yhat']                             # 데이터 프레임에 담겨있는 예측한 가격 데이터
 
-    real_price = df['y']                                      # 실제 가격 데이터
+    #real_price = df['y']                                      # 실제 가격 데이터
 
     date = forecast['ds']                                     # 데이터 프레임에 담겨있는 날짜 데이터
+    
+    real_price_list = []
+    pred_price_list = []
 
-    return pred_price, real_price, date                 # 예측 가격, 실제 가격 추세 일시를 반환
+    for i in range(len(date)):
+        pred_price = {"days":date[i],"value":forecast['yhat'][i]}
 
-def real_time_chart(ticker="BTC"):                      # 실시간 가격을 계속 추가하는 사용자 함수
+        pred_price_list.append(pred_price)
 
-    n = 0
-    while True:
-        df = pyupbit.get_ohlcv(f"KRW-{ticker}", count=3000 + n, interval="minute60")
-        df['y'] = df['close']
-        df['ds'] = df.index
+    for i in range(len(df['y'])):
+        real_price = {"days":date[i],"value":df['y'][i]}
 
-        n = n + 1
-        forecast = fitting_to_real_price(df)
+        real_price_list.append(real_price)
+    # return pred_price, real_price
+    return pred_price_list, real_price_list                 # 예측 가격, 실제 가격 추세 일시를 반환
+    
 
-        return df['y'], forecast['yhat'], forecast['ds']
+get_crypto_price()
+
+# def real_time_chart(ticker="BTC"):                      # 실시간 가격을 계속 추가하는 사용자 함수
+
+#     n = 0
+#     while True:
+#         df = pyupbit.get_ohlcv(f"KRW-{ticker}", count=3000 + n, interval="minute60")
+#         df['y'] = df['close']
+#         df['ds'] = df.index
+
+#         n = n + 1
+#         forecast = fitting_to_real_price(df)
+
+#         return df['y'], forecast['yhat'], forecast['ds']
 
 
 
 
 
-pyupbit.get_current_price(f"KRW-BTC")
-a, b, c, d, e, f, g, h, i = time.localtime()
-a
-print(pyupbit.get_daily_ohlcv_from_base("KRW-BTC", base=13))
+# pyupbit.get_current_price(f"KRW-BTC")
+# a, b, c, d, e, f, g, h, i = time.localtime()
+# a
+# print(pyupbit.get_daily_ohlcv_from_base("KRW-BTC", base=13))
