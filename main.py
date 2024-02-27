@@ -40,41 +40,32 @@ async def read_root(ticker1: str, ticker2:str):
     pred_price1, real_price1 = get_crypto_price(ticker1)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
     pred_price2, real_price2 = get_crypto_price(ticker2)
 
-<<<<<<< HEAD
 
-    return [{"days":date1, "value":pred_price1}, {"days":date1, "value":real_price1},                        
-            {"days":date1, "value":pred_price2}, {"days":date1, "value":real_price2}]           # 일시와 예측 가격데이터를 spring서버로 전달
-=======
+    #return [{"days":date1, "value":pred_price1}, {"days":date1, "value":real_price1},                        
+    #        {"days":date1, "value":pred_price2}, {"days":date1, "value":real_price2}]           # 일시와 예측 가격데이터를 spring서버로 전달
     # return [{"days":date1, "value":pred_price1}, {"days":date1,"value":real_price1}, {"days":date2,"value":pred_price2}, {"days":date2,"value":real_price2}]           # 일시와 예측 가격데이터를 spring서버로 전달
     return [[pred_price1], [real_price1], [pred_price2], [real_price2]]
->>>>>>> 831a4b1ee6063336e4d05f8cb71792454b3a8e28
 
 # @app.get("/realtimeChart/{ticker}")
 # async def read_root(ticker: str):
 
-<<<<<<< HEAD
-=======
 #     pred_price, real_price, date = real_time_chart(ticker)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
         
 #     return {"days":date, "pred_price":pred_price, "real_price":real_price}   
->>>>>>> 831a4b1ee6063336e4d05f8cb71792454b3a8e28
-    pred_price, real_price, date = get_crypto_price(ticker)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
+    #pred_price, real_price, date = get_crypto_price(ticker)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
 
-    return {"days":date, "pred_price":pred_price, "real_price":real_price}           # 일시와 예측 가격데이터를 spring서버로 전달
+    #return {"days":date, "pred_price":pred_price, "real_price":real_price}           # 일시와 예측 가격데이터를 spring서버로 전달
 
 
 # @app.get("/items/{item_id}")
 # def read_item(item_id: int, q: Union[str, None] = None):
 #     return {"item_id": item_id, "q": q}
-<<<<<<< HEAD
     # pred_price, real_price, date = real_time_chart(ticker)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
         
     # return {"days":date, "pred_price":pred_price, "real_price":real_price}   
-=======
-    pred_price, real_price, date = real_time_chart(ticker)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
+   # pred_price, real_price, date = real_time_chart(ticker)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
         
-    return {"days":date, "pred_price":pred_price, "real_price":real_price}   
->>>>>>> 831a4b1ee6063336e4d05f8cb71792454b3a8e28
+   # return {"days":date, "pred_price":pred_price, "real_price":real_price}   
 
 
 # AI API
@@ -82,10 +73,6 @@ async def read_root(ticker1: str, ticker2:str):
 
 
 def fitting_to_real_price(df):                          # 학습 데이터를 Fitting 시키는 사용자 함수
-<<<<<<< HEAD
-        
-=======
->>>>>>> 831a4b1ee6063336e4d05f8cb71792454b3a8e28
     m = prh(                                            
     growth="linear",
     interval_width=0.95
@@ -93,24 +80,20 @@ def fitting_to_real_price(df):                          # 학습 데이터를 Fi
 
     m.fit(df)                                           # 학습데이터 Fitting
 
-    future = m.make_future_dataframe(periods=240)      # 예상 주기 설정
+    future = m.make_future_dataframe(periods=240, freq='H')      # 예상 주기 설정
 
     forecast = m.predict(future)                        # 예측한 값을 forecast변수에 저장
 
     # forecast['yhat'] = forecast['yhat'].astype('float') # 숫자형식을 float로 변환
 
-    forecast['ds'] = forecast['ds'].astype('str')     # 예측과 실제 가격 추세 그래프를 양쪽으로 나눠서 그릴 수 있음
+    # forecast['ds'] = forecast['ds'].astype('str')     # 예측과 실제 가격 추세 그래프를 양쪽으로 나눠서 그릴 수 있음
     
     return forecast                                     # 예측값 반환
 
 def get_crypto_price(ticker="BTC"):                   # 가상화폐의 가격을 가져오는 사용자 함수
 
-<<<<<<< HEAD
-    df = pyupbit.get_ohlcv(f"KRW-{ticker}", count=4320, interval="day")     # 원화 단위의 가상화폐, 시간 단위는 분 단위, 현재 시점부터 2000분 전의 데이터를 요청
-=======
     df = pyupbit.get_ohlcv(f"KRW-{ticker}", count=4320, interval="minute60")     # 원화 단위의 가상화폐, 시간 단위는 분 단위, 현재 시점부터 2000분 전의 데이터를 요청
     df.reset_index(inplace=True)
->>>>>>> 831a4b1ee6063336e4d05f8cb71792454b3a8e28
     df['y'] = df['close']
     df['ds'] = df['index']
 
@@ -134,6 +117,7 @@ def get_crypto_price(ticker="BTC"):                   # 가상화폐의 가격�
         real_price = {"days":date[i],"value":df['y'][i]}
 
         real_price_list.append(real_price)
+
     # return pred_price, real_price
     return pred_price_list, real_price_list                 # 예측 가격, 실제 가격 추세 일시를 반환
     
