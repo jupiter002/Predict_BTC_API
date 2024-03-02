@@ -38,13 +38,13 @@ app.add_middleware(             # cors보안 규칙 인가
 async def read_root(ticker1: str, ticker2:str):
 
     pred_price1, real_price1 = get_crypto_price(ticker1)     # 전달받은 가상화폐 ticker를 함수에 인자값으로 전달
-    pred_price2, real_price2 = get_crypto_price(ticker2)
+    # pred_price2, real_price2 = get_crypto_price(ticker2)
 
 
     #return [{"days":date1, "value":pred_price1}, {"days":date1, "value":real_price1},                        
     #        {"days":date1, "value":pred_price2}, {"days":date1, "value":real_price2}]           # 일시와 예측 가격데이터를 spring서버로 전달
     # return [{"days":date1, "value":pred_price1}, {"days":date1,"value":real_price1}, {"days":date2,"value":pred_price2}, {"days":date2,"value":real_price2}]           # 일시와 예측 가격데이터를 spring서버로 전달
-    return [[pred_price1], [real_price1], [pred_price2], [real_price2]]
+    return [[pred_price1], [real_price1]]
 
 # @app.get("/realtimeChart/{ticker}")
 # async def read_root(ticker: str):
