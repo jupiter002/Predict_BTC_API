@@ -7,7 +7,7 @@ import pyupbit
 
 raw = pyupbit.get_ohlcv("KRW-BTC", interval="minute60", count=4320, to="20240222")
 
-window_size,forecast_size=60,24
+window_size,forecast_size=240,24
 ''' 1. preprocess raw data '''
 date, data=split_data(raw,'close')
 ''' 2. build dataloader '''
@@ -23,4 +23,6 @@ pred=trainer(data,
 ''' 4. plot the result '''
 figureplot(date,data,pred,window_size,forecast_size)
 
-pred
+len(pred)
+len(date[4296:])
+len(data[4296:])
